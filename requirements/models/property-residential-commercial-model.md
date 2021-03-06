@@ -1,0 +1,26 @@
+# Property Residential Commercial Model
+>> ## Models
+ 
+### PropertyResidentialCommercialModel extends PropertyModel
+- **Registered House Plan**(boolean)
+- **Property Age**(number?)
+- **Suites** (number?)
+- **Bathrooms** (number?)
+- **Rooms** (number?)
+- **Garage** (number?)
+- **Garage Covered** (number?)
+- **Air Conditioner** (boolean)
+- **Bar** (boolean)
+- **Library** (boolean)
+- **Barbecue Grill** (boolean)
+- **American Kitchen** (boolean)
+- **Fitted Kitchen** (boolean)
+- **Pantry** (boolean)
+- **Edicule** (boolean)
+- **Office** (boolean)
+- **Bathtub** (boolean)
+- **Fireplace** (boolean)
+- **Lavatory** (boolean)
+- **Furnished** (boolean)
+- **Pool** (boolean)
+- **Steam Room** (boolean)
