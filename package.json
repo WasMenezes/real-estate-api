@@ -1,0 +1,26 @@
+{
+  "name": "real-state-api",
+  "version": "1.0.0",
+  "description": "> ## Models\r 1. [Address Model](./requirements/models/address-model.md)\r 2. [Property Type](./requirements/models/property-type-model.md)\r 3. [Property Model](./requirements/models/property-model.md)\r 4. [Property Residential Commercial Model](./requirements/models/property-residential-commercial-model.md)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WasMenezes/real-state-api.git"
+  },
+  "keywords": [
+    "real-state-api",
+    "nodejs",
+    "tdd",
+    "clean",
+    "architecture"
+  ],
+  "author": "WasMenezes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WasMenezes/real-state-api/issues"
+  },
+  "homepage": "https://github.com/WasMenezes/real-state-api#readme"
+}
