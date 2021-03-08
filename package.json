@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/WasMenezes/real-state-api/issues"
   },
-  "homepage": "https://github.com/WasMenezes/real-state-api#readme"
+  "homepage": "https://github.com/WasMenezes/real-state-api#readme",
+  "devDependencies": {
+    "git-commit-msg-linter": "^3.0.0"
+  }
 }
