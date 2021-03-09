@@ -11,5 +11,12 @@ export class LoginController {
     if (!httpRequest.body.password) {
       return badRequest(new MissingParamError('password'))
     }
+
+    const requiredFields = ['email', 'password']
+    for (const field of requiredFields) {
+      if (!httpRequest.body[field]) {
+        return badRequest(new MissingParamError(field))
+      }
+    }
   }
 }
