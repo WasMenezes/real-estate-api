@@ -1,5 +1,5 @@
-import { MissingParamError } from '../errors/missing-param-error'
-import { HttpRequest, HttpResponse } from '../protocols/http'
+import { MissingParamError } from '@/presentation/errors/missing-param-error'
+import { HttpRequest, HttpResponse } from '@/presentation/protocols/http'
 import { LoginController } from './login'
 
 describe('Login Controller', () => {

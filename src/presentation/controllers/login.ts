@@ -1,7 +1,7 @@
-import { MissingParamError } from '../errors/missing-param-error'
-import { badRequest } from '../helpers/http-helper'
-import { HttpResponse, HttpRequest } from '../protocols/http'
-import { Controller } from '../protocols/controller'
+import { MissingParamError } from '@/presentation/errors/missing-param-error'
+import { badRequest } from '@/presentation/helpers/http-helper'
+import { HttpResponse, HttpRequest } from '@/presentation/protocols/http'
+import { Controller } from '@/presentation/protocols/controller'
 
 export class LoginController implements Controller {
   handle (httpRequest: HttpRequest): HttpResponse {
