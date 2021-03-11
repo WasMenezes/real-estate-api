@@ -1,9 +1,8 @@
 import { MissingParamError } from '@/presentation/errors/missing-param-error'
-import { badRequest } from '@/presentation/helpers/http-helper'
+import { badRequest, serverError } from '@/presentation/helpers/http-helper'
 import { HttpResponse, HttpRequest } from '@/presentation/protocols/http'
 import { Controller } from '@/presentation/protocols/controller'
 import { InvalidParamError } from '../errors/invalid-param-error'
-import { ServerError } from '../errors/server-error'
 
 export class LoginController implements Controller {
   constructor (
@@ -31,10 +30,7 @@ export class LoginController implements Controller {
         return badRequest(new InvalidParamError('email'))
       }
     } catch (error) {
-      return {
-        statusCode: 500,
-        body: new ServerError()
-      }
+      return serverError()
     }
   }
 }
