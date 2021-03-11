@@ -121,4 +121,20 @@ describe('Login Controller', () => {
       password: 'any_password'
     })
   })
+
+  test('Should return 500 if Authentication throws', () => {
+    const { sut, authenticationStub } = makeSut()
+    jest.spyOn(authenticationStub, 'auth').mockImplementation(() => {
+      throw new Error()
+    })
+    const httpRequest: HttpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
+  })
 })
