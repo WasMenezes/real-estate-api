@@ -1,11 +1,8 @@
 import { MissingParamError, InvalidParamError, ServerError } from '@/presentation/errors'
 import { HttpRequest, HttpResponse, EmailValidator } from '@/presentation/protocols'
 import { LoginController } from '@/presentation/controllers/login-controller'
+import { Authentication, AuthenticationModel } from '@/domain/usecases/authentication'
 
-interface SutTypes {
-  sut: LoginController
-  emailValidatorStub: EmailValidator
-}
 const makeEmailValidatorStub = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid (email: string): boolean {
@@ -15,12 +12,29 @@ const makeEmailValidatorStub = (): EmailValidator => {
   return new EmailValidatorStub()
 }
 
+const makeAuthenticationStub = (): Authentication => {
+  class AuthenticationStub implements Authentication {
+    async auth (authentication: AuthenticationModel): Promise<string> {
+      return new Promise(resolve => resolve('any_token'))
+    }
+  }
+  return new AuthenticationStub()
+}
+
+interface SutTypes {
+  sut: LoginController
+  emailValidatorStub: EmailValidator
+  authenticationStub: Authentication
+}
+
 const makeSut = (): SutTypes => {
   const emailValidatorStub = makeEmailValidatorStub()
-  const sut = new LoginController(emailValidatorStub)
+  const authenticationStub = makeAuthenticationStub()
+  const sut = new LoginController(emailValidatorStub, authenticationStub)
   return {
     sut,
-    emailValidatorStub
+    emailValidatorStub,
+    authenticationStub
   }
 }
 describe('Login Controller', () => {
@@ -90,5 +104,22 @@ describe('Login Controller', () => {
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should call Authentication with correct values', () => {
+    const { sut, authenticationStub } = makeSut()
+    const authpy = jest.spyOn(authenticationStub, 'auth')
+
+    const httpRequest: HttpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    sut.handle(httpRequest)
+    expect(authpy).toHaveBeenCalledWith({
+      email: 'any_email@mail.com',
+      password: 'any_password'
+    })
   })
 })
