@@ -3,6 +3,7 @@ import { HttpRequest, HttpResponse } from '@/presentation/protocols/http'
 import { LoginController } from '@/presentation/controllers/login-controller'
 import { InvalidParamError } from '@/presentation/errors/invalid-param-error'
 import { EmailValidator } from '@/presentation/protocols/email-validator'
+import { ServerError } from '@/presentation/errors/server-error'
 
 interface SutTypes {
   sut: LoginController
@@ -76,5 +77,21 @@ describe('Login Controller', () => {
     }
     sut.handle(httpRequest)
     expect(isValid).toHaveBeenCalledWith('any_email@mail.com')
+  })
+
+  test('Should return 500 if EmailValidator throws', () => {
+    const { sut, emailValidatorStub } = makeSut()
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementation(() => {
+      throw new Error()
+    })
+    const httpRequest: HttpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 })
