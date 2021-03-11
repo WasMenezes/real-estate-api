@@ -1,10 +1,13 @@
+import { Authentication } from '@/domain/usecases/authentication'
 import { MissingParamError, InvalidParamError } from '@/presentation/errors'
 import { badRequest, serverError } from '@/presentation/helpers/http-helper'
-import { HttpResponse, HttpRequest, Controller } from '@/presentation/protocols'
+import { HttpResponse, HttpRequest, Controller, EmailValidator } from '@/presentation/protocols'
 
 export class LoginController implements Controller {
   constructor (
-    private readonly emailValidator: any
+    private readonly emailValidator: EmailValidator,
+    private readonly authentication: Authentication
+
   ) { }
 
   handle (httpRequest: HttpRequest): HttpResponse {
@@ -27,6 +30,8 @@ export class LoginController implements Controller {
       if (!isValid) {
         return badRequest(new InvalidParamError('email'))
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const acessToken = this.authentication.auth(httpRequest.body)
     } catch (error) {
       return serverError()
     }
