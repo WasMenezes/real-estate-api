@@ -1,8 +1,7 @@
-import { MissingParamError } from '@/presentation/errors/missing-param-error'
+import { MissingParamError, InvalidParamError } from '@/presentation/errors'
 import { badRequest, serverError } from '@/presentation/helpers/http-helper'
 import { HttpResponse, HttpRequest } from '@/presentation/protocols/http'
 import { Controller } from '@/presentation/protocols/controller'
-import { InvalidParamError } from '../errors/invalid-param-error'
 
 export class LoginController implements Controller {
   constructor (
