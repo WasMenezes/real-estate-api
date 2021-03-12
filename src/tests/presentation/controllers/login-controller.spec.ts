@@ -1,6 +1,7 @@
 import { MissingParamError, InvalidParamError, ServerError } from '@/presentation/errors'
 import { HttpRequest, HttpResponse, Authentication, AuthenticationModel, EmailValidator } from '@/presentation/controllers/login/login-protocols'
 import { LoginController } from '@/presentation/controllers/login/login-controller'
+import { unauthorizedError } from '@/presentation/helpers/http-helper'
 
 const makeEmailValidatorStub = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
@@ -136,5 +137,19 @@ describe('Login Controller', () => {
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should return 403 if Authentication returns null', () => {
+    const { sut, authenticationStub } = makeSut()
+    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(null)
+
+    const httpRequest: HttpRequest = {
+      body: {
+        email: 'unauthorized_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const htpResponse = sut.handle(httpRequest)
+    expect(htpResponse).toEqual(unauthorizedError())
   })
 })
