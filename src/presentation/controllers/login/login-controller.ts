@@ -1,6 +1,6 @@
 import { Authentication, HttpResponse, HttpRequest, Controller, EmailValidator } from './login-protocols'
 import { MissingParamError, InvalidParamError } from '@/presentation/errors'
-import { badRequest, serverError } from '@/presentation/helpers/http-helper'
+import { badRequest, serverError, unauthorizedError } from '@/presentation/helpers/http-helper'
 
 export class LoginController implements Controller {
   constructor (
@@ -29,8 +29,10 @@ export class LoginController implements Controller {
       if (!isValid) {
         return badRequest(new InvalidParamError('email'))
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const acessToken = this.authentication.auth(httpRequest.body)
+      const accessToken = this.authentication.auth(httpRequest.body)
+      if (!accessToken) {
+        return unauthorizedError()
+      }
     } catch (error) {
       return serverError()
     }
