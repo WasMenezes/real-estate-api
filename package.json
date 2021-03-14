@@ -4,7 +4,7 @@
   "description": "> ## Models\r 1. [Address Model](./requirements/models/address-model.md)\r 2. [Property Type](./requirements/models/property-type-model.md)\r 3. [Property Model](./requirements/models/property-model.md)\r 4. [Property Residential Commercial Model](./requirements/models/property-residential-commercial-model.md)",
   "main": "index.js",
   "scripts": {
-    "test": "jest --passWithNoTests --silent --noStackTrace --runInBand --watch",
+    "test": "jest --passWithNoTests --runInBand --no-cache",
     "test:verbose": "jest --passWithNoTests",
     "test:staged": "npm test -- --findRelatedTests",
     "test:unit": "npm test -- --watch -c jest-unit-config.js",
