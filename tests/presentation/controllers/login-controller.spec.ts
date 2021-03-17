@@ -1,8 +1,7 @@
 import { MissingParamError, InvalidParamError, ServerError } from '@/presentation/errors'
-import { HttpRequest, HttpResponse, Authentication, AuthenticationModel, EmailValidator } from '@/presentation/controllers/login/login-protocols'
+import { HttpRequest, HttpResponse, Authentication, EmailValidator } from '@/presentation/controllers/login/login-protocols'
 import { LoginController } from '@/presentation/controllers/login/login-controller'
 import { unauthorizedError } from '@/presentation/helpers/http-helper'
-
 const makeEmailValidatorStub = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid (email: string): boolean {
@@ -14,8 +13,11 @@ const makeEmailValidatorStub = (): EmailValidator => {
 
 const makeAuthenticationStub = (): Authentication => {
   class AuthenticationStub implements Authentication {
-    async auth (authentication: AuthenticationModel): Promise<string> {
-      return new Promise(resolve => resolve('any_token'))
+    async auth (authentication: Authentication.Params): Promise<Authentication.Result> {
+      return new Promise(resolve => resolve({
+        accessToken: 'any_token',
+        name: 'any_name'
+      }))
     }
   }
   return new AuthenticationStub()
@@ -141,7 +143,7 @@ describe('Login Controller', () => {
 
   test('Should return 403 if Authentication returns null', async () => {
     const { sut, authenticationStub } = makeSut()
-    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(null)
+    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(new Promise(resolve => resolve(null)))
 
     const httpRequest: HttpRequest = {
       body: {
