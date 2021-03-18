@@ -1,5 +1,5 @@
 import { LoadAccountByEmailRepository } from '../protocols/db/account/load-account-by-email-repository'
-import { DbAuthentication } from '@/data/usecases/db-authentication-account'
+import { DbAuthentication } from '@/data/usecases/db-authentication'
 
 const makeFakeAccount = (): LoadAccountByEmailRepository.Result => ({
   id: 'any_id',
