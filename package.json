@@ -4,6 +4,7 @@
   "description": "> ## Models\r 1. [Address Model](./requirements/models/address-model.md)\r 2. [Property Type](./requirements/models/property-type-model.md)\r 3. [Property Model](./requirements/models/property-model.md)\r 4. [Property Residential Commercial Model](./requirements/models/property-residential-commercial-model.md)",
   "main": "index.js",
   "scripts": {
+    "start": "sucrase-node src/main/server.ts",
     "test": "jest --passWithNoTests --runInBand --no-cache",
     "test:verbose": "jest --passWithNoTests",
     "test:staged": "npm test -- --findRelatedTests",
@@ -45,10 +46,13 @@
     "husky": "^4.3.8",
     "jest": "^26.6.3",
     "lint-staged": "^10.5.4",
+    "sucrase": "^3.17.1",
     "ts-jest": "^26.5.3",
     "typescript": "^4.2.3"
   },
   "dependencies": {
+    "@types/express": "^4.17.11",
+    "express": "^4.17.1",
     "module-alias": "^2.2.2",
     "mongodb": "3.6.3",
     "validator": "^13.5.2"
