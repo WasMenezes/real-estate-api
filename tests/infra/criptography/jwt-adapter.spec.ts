@@ -27,5 +27,11 @@ describe('Jwt Adapter', () => {
       const promise = sut.encrypt('any_value')
       await expect(promise).rejects.toThrow()
     })
+
+    test('Should JwtAdapter return hashed value when encrypt succeeds', async () => {
+      const sut = makeSut()
+      const httpResponse = await sut.encrypt('any_value')
+      expect(httpResponse).toBe('encrypted_value')
+    })
   })
 })
