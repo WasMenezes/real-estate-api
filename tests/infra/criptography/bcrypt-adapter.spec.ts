@@ -15,11 +15,17 @@ const makeSut = (): BcryptAdapter => {
 
 describe('Bcrypt Adapter', () => {
   describe('hashComparer()', () => {
-    test('should call comparer with correct values', async () => {
+    test('should call compare with correct values', async () => {
       const sut = makeSut()
       const compareSpy = jest.spyOn(bcrypt, 'compare')
       await sut.compare('any_text', 'any_hash')
       expect(compareSpy).toHaveBeenCalledWith('any_text', 'any_hash')
+    })
+
+    test('should return true when compare succeeds', async () => {
+      const sut = makeSut()
+      const isValid = await sut.compare('any_text', 'any_hash')
+      expect(isValid).toBe(true)
     })
   })
 })
