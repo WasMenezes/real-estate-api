@@ -7,6 +7,18 @@ const makeSut = (): AccountMongoRepository => {
   return new AccountMongoRepository()
 }
 
+class FakeAccount {
+  name: string
+  email: string
+  password: string
+}
+
+const makeFakeAccount = (): FakeAccount => ({
+  name: 'any_name',
+  email: 'any_email@mail.com',
+  password: 'any_password'
+})
+
 let accountCollection: Collection
 describe('AccountMongoRepository', () => {
   beforeAll(async () => {
@@ -25,11 +37,7 @@ describe('AccountMongoRepository', () => {
   describe('loadByEmail()', () => {
     test('should return an account on loadByEmail sucess', async () => {
       const sut = makeSut()
-      await accountCollection.insertOne({
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password'
-      })
+      await accountCollection.insertOne(makeFakeAccount())
       const account = await sut.loadByEmail('any_email@mail.com')
 
       expect(account).toBeTruthy()
@@ -48,14 +56,11 @@ describe('AccountMongoRepository', () => {
   describe('updateAccessToken()', () => {
     test('should update an account with accessToken if updateAccessToken succeeds', async () => {
       const sut = makeSut()
-      await accountCollection.insertOne({
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password'
-      })
-      const accountBefore = await accountCollection.findOne({ email: 'any_email@mail.com' })
-      await sut.updateAccessToken(accountBefore._id, 'any_token')
+      const res = await accountCollection.insertOne(makeFakeAccount())
+      const fakeAccount = res.ops[0]
+      await sut.updateAccessToken(fakeAccount._id, 'any_token')
       const account = await accountCollection.findOne({ email: 'any_email@mail.com' })
+      expect(account).toBeTruthy()
       expect(account.accessToken).toEqual('any_token')
     })
   })
