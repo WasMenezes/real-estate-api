@@ -142,5 +142,17 @@ describe('DbAuthentication Usecase', () => {
       })
       expect(encryptSpy).toBeCalledWith(makeFakeAccount().id)
     })
+
+    test('should throws if encryter throws', async () => {
+      const { sut, encrypterStub } = makeSut()
+      jest.spyOn(encrypterStub, 'encrypt').mockImplementationOnce(() => {
+        throw new Error()
+      })
+      const promise = sut.auth({
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      })
+      await expect(promise).rejects.toThrow()
+    })
   })
 })
