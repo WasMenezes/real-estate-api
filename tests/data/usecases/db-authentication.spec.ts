@@ -108,6 +108,16 @@ describe('DbAuthentication Usecase', () => {
       })
       expect(compareSpy).toBeCalledWith('any_password', makeFakeAccount().password)
     })
+
+    test('Should return null if HashComparer return false', async () => {
+      const { sut, hashComparerStub } = makeSut()
+      jest.spyOn(hashComparerStub, 'compare').mockImplementationOnce(async () => new Promise(resolve => resolve(false)))
+      const httpResponse = await sut.auth({
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      })
+      expect(httpResponse).toBe(null)
+    })
   })
 
   describe('Encrypter', () => {
