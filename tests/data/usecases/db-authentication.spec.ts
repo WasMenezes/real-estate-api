@@ -12,7 +12,7 @@ const makeFakeAccount = (): LoadAccountByEmailRepository.Result => ({
 
 const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
   class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
-    async loadByEmail (email: string): Promise<LoadAccountByEmailRepository.Result> {
+    async loadByEmail (): Promise<LoadAccountByEmailRepository.Result> {
       return new Promise(resolve => resolve(makeFakeAccount()))
     }
   }
@@ -22,7 +22,7 @@ const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
 
 const makeHashComparerStub = (): HashComparer => {
   class HashComparerRepositorytub implements HashComparer {
-    async compare (plaitext: string, digest: string): Promise<boolean> {
+    async compare (): Promise<boolean> {
       return new Promise(resolve => resolve(true))
     }
   }
@@ -32,7 +32,7 @@ const makeHashComparerStub = (): HashComparer => {
 
 const makeEncrypterStub = (): Encrypter => {
   class HashComparerRepositorytub implements Encrypter {
-    async encrypt (plaintext: string): Promise<string> {
+    async encrypt (): Promise<string> {
       return new Promise(resolve => resolve('encrypted_value'))
     }
   }
@@ -42,7 +42,7 @@ const makeEncrypterStub = (): Encrypter => {
 
 const makeUpdateAccessTokenStub = (): UpdateAccessToken => {
   class UpdateAccessTokenStub implements UpdateAccessToken {
-    async updateAccessToken (id: string, token: string): Promise<void> {
+    async updateAccessToken (): Promise<void> {
       return new Promise(resolve => resolve())
     }
   }
@@ -192,6 +192,19 @@ describe('DbAuthentication Usecase', () => {
         password: 'any_password'
       })
       await expect(promise).rejects.toThrow()
+    })
+  })
+
+  test('should return Authentication Result if auth succeeds', async () => {
+    const { sut } = makeSut()
+    const account = await sut.auth({
+      email: 'any_email@mail.com',
+      password: 'any_password'
+    })
+
+    expect(account).toEqual({
+      name: 'any_name',
+      accessToken: 'encrypted_value'
     })
   })
 })
