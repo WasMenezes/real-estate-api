@@ -13,7 +13,6 @@ export class DbAuthentication implements Authentication {
     if (account) {
       await this.hashComparer.compare(authenticationParams.password, account.password)
     }
-
-    return new Promise(resolve => resolve(null))
+    return null
   }
 }
