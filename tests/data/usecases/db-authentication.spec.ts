@@ -1,6 +1,7 @@
 import { LoadAccountByEmailRepository } from '../protocols/db/account/load-account-by-email-repository'
 import { DbAuthentication } from '@/data/usecases/db-authentication'
 import { HashComparer } from '../protocols/criptography/hash-comparer'
+import { Encrypter } from '../protocols/criptography/encrypter'
 
 const makeFakeAccount = (): LoadAccountByEmailRepository.Result => ({
   id: 'any_id',
@@ -18,7 +19,7 @@ const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
   return new LoadAccountByEmailRepositoryStub()
 }
 
-const makeHashComparerRepository = (): HashComparer => {
+const makeHashComparerStub = (): HashComparer => {
   class HashComparerRepositorytub implements HashComparer {
     async compare (plaitext: string, digest: string): Promise<boolean> {
       return new Promise(resolve => resolve(true))
@@ -28,17 +29,30 @@ const makeHashComparerRepository = (): HashComparer => {
   return new HashComparerRepositorytub()
 }
 
+const makeEncrypterStub = (): Encrypter => {
+  class HashComparerRepositorytub implements Encrypter {
+    async encrypt (plaintext: string): Promise<string> {
+      return new Promise(resolve => resolve('encrypted_value'))
+    }
+  }
+
+  return new HashComparerRepositorytub()
+}
+
 const makeSut = (): SutTypes => {
   const loadAccountByEmailRepositoryStub = makeLoadAccountByEmailRepository()
-  const hashComparerStub = makeHashComparerRepository()
+  const hashComparerStub = makeHashComparerStub()
+  const encrypterStub = makeEncrypterStub()
   const sut = new DbAuthentication(
     loadAccountByEmailRepositoryStub,
-    hashComparerStub
+    hashComparerStub,
+    encrypterStub
   )
   return {
     sut,
     loadAccountByEmailRepositoryStub,
-    hashComparerStub
+    hashComparerStub,
+    encrypterStub
   }
 }
 
@@ -46,6 +60,7 @@ interface SutTypes {
   sut: DbAuthentication
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepository
   hashComparerStub: HashComparer
+  encrypterStub: Encrypter
 }
 
 describe('DbAuthentication Usecase', () => {
@@ -92,6 +107,18 @@ describe('DbAuthentication Usecase', () => {
         password: 'any_password'
       })
       expect(compareSpy).toBeCalledWith('any_password', makeFakeAccount().password)
+    })
+  })
+
+  describe('Encrypter', () => {
+    test('should call encryter with correct values', async () => {
+      const { sut, encrypterStub } = makeSut()
+      const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
+      await sut.auth({
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      })
+      expect(encryptSpy).toBeCalledWith(makeFakeAccount().id)
     })
   })
 })
