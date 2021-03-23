@@ -41,8 +41,22 @@ describe('AccountMongoRepository', () => {
     test('should return null if loadByEmail fails', async () => {
       const sut = makeSut()
       const account = await sut.loadByEmail('any_email@mail.com')
-
       expect(account).toBeFalsy()
+    })
+  })
+
+  describe('updateAccessToken()', () => {
+    test('should update an account with accessToken if updateAccessToken succeeds', async () => {
+      const sut = makeSut()
+      await accountCollection.insertOne({
+        name: 'any_name',
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      })
+      const accountBefore = await accountCollection.findOne({ email: 'any_email@mail.com' })
+      await sut.updateAccessToken(accountBefore._id, 'any_token')
+      const account = await accountCollection.findOne({ email: 'any_email@mail.com' })
+      expect(account.accessToken).toEqual('any_token')
     })
   })
 })
