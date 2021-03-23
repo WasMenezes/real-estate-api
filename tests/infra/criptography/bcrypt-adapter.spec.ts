@@ -17,7 +17,7 @@ const makeSut = (): BcryptAdapter => {
 }
 
 describe('Bcrypt Adapter', () => {
-  describe('hashComparer()', () => {
+  describe('compare()', () => {
     test('should call compare with correct values', async () => {
       const sut = makeSut()
       const compareSpy = jest.spyOn(bcrypt, 'compare')
@@ -46,7 +46,7 @@ describe('Bcrypt Adapter', () => {
     })
   })
 
-  describe('encrypt()', () => {
+  describe('hash()', () => {
     test('should call hash with correct values', async () => {
       const sut = makeSut()
       const hashSpy = jest.spyOn(bcrypt, 'hash')
