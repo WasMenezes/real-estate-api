@@ -62,5 +62,11 @@ describe('Bcrypt Adapter', () => {
       const promise = sut.encrypt('any_id')
       await expect(promise).rejects.toThrow()
     })
+
+    test('should return an encrypted value if hash succeeds', async () => {
+      const sut = makeSut()
+      const httpResponse = await sut.encrypt('any_id')
+      expect(httpResponse).toBe('encrypted_value')
+    })
   })
 })
