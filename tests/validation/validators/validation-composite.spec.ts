@@ -1,3 +1,4 @@
+import { MissingParamError } from '@/presentation/errors'
 import { Validation } from '@/presentation/protocols/validation'
 import { ValidationComposite } from '@/validation/validators/validation-composite'
 
@@ -16,7 +17,10 @@ interface SutTypes {
 }
 
 const makeSut = (): SutTypes => {
-  const fakeValidators = [makeFakeValidator()]
+  const fakeValidators = [
+    makeFakeValidator(),
+    makeFakeValidator()
+  ]
   const sut = new ValidationComposite(fakeValidators)
   return {
     sut,
@@ -36,5 +40,18 @@ describe('Validation Composite', () => {
     const { sut } = makeSut()
     const error = sut.validate('any_input')
     expect(error).toBeFalsy()
+  })
+
+  test('should return the first error if more then one validation fails', () => {
+    const { sut, fakeValidators } = makeSut()
+    jest.spyOn(fakeValidators[0], 'validate').mockImplementationOnce(() => {
+      return new Error()
+    })
+
+    jest.spyOn(fakeValidators[1], 'validate').mockImplementationOnce(() => {
+      return new MissingParamError('any_param')
+    })
+    const error = sut.validate('any_input')
+    expect(error).toStrictEqual(new Error())
   })
 })
