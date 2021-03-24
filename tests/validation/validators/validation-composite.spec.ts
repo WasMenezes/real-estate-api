@@ -31,4 +31,10 @@ describe('Validation Composite', () => {
     sut.validate('any_input')
     expect(validateSpy).toBeCalledWith('any_input')
   })
+
+  test('should return null if succeeds', () => {
+    const { sut } = makeSut()
+    const error = sut.validate('any_input')
+    expect(error).toBeFalsy()
+  })
 })
