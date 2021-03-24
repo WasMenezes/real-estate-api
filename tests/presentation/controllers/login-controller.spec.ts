@@ -1,7 +1,7 @@
-import { MissingParamError, InvalidParamError, ServerError } from '@/presentation/errors'
+import { MissingParamError, InvalidParamError } from '@/presentation/errors'
 import { HttpRequest, HttpResponse, Authentication, EmailValidator } from '@/presentation/controllers/login/login-protocols'
 import { LoginController } from '@/presentation/controllers/login/login-controller'
-import { unauthorizedError } from '@/presentation/helpers/http-helper'
+import { serverError, unauthorizedError } from '@/presentation/helpers/http-helper'
 const makeEmailValidatorStub = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid (email: string): boolean {
@@ -104,8 +104,7 @@ describe('Login Controller', () => {
       }
     }
     const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
+    expect(httpResponse).toEqual(serverError(new Error()))
   })
 
   test('Should call Authentication with correct values', async () => {
@@ -137,8 +136,7 @@ describe('Login Controller', () => {
       }
     }
     const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
+    expect(httpResponse).toEqual(serverError(new Error()))
   })
 
   test('Should return 403 if Authentication returns null', async () => {
@@ -155,7 +153,7 @@ describe('Login Controller', () => {
     expect(htpResponse).toEqual(unauthorizedError())
   })
 
-  test('Should return access if Authentication succeeds', async () => {
+  test('Should return authenticationModel if Authentication succeeds', async () => {
     const { sut } = makeSut()
 
     const httpRequest: HttpRequest = {
@@ -165,6 +163,6 @@ describe('Login Controller', () => {
       }
     }
     const htpResponse = await sut.handle(httpRequest)
-    expect(htpResponse.body).toEqual('any_token')
+    expect(htpResponse.body).toEqual({ accessToken: 'any_token', name: 'any_name' })
   })
 })
