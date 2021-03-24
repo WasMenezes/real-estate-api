@@ -1,6 +1,6 @@
 import { HttpRequest, Authentication, Validation } from '@/presentation/controllers/login/login-protocols'
 import { LoginController } from '@/presentation/controllers/login/login-controller'
-import { serverError, unauthorizedError } from '@/presentation/helpers/http-helper'
+import { badRequest, serverError, unauthorizedError } from '@/presentation/helpers/http-helper'
 
 const makeValidationStub = (): Validation => {
   class ValidationStub implements Validation {
@@ -55,6 +55,22 @@ describe('Login Controller', () => {
       email: 'any_email@mail.com',
       password: 'any_password'
     })
+  })
+
+  test('Should return a badRequest if Validation fails', async () => {
+    const { sut, validationStub } = makeSut()
+    jest.spyOn(validationStub, 'validate').mockImplementationOnce(() => {
+      return new Error()
+    })
+
+    const httpRequest: HttpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual(badRequest(new Error()))
   })
 
   test('Should call Authentication with correct values', async () => {
