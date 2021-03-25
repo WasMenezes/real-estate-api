@@ -1,5 +1,6 @@
 import { LogErrorRepository } from '@/data/protocols/db/log/log-error-repository'
 import { LogControllerDecorator } from '@/main/decorator/log-controller-decorator'
+import { serverError } from '@/presentation/helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '@/presentation/protocols'
 
 const makeControllerStub = (): Controller => {
@@ -50,5 +51,22 @@ describe('LogControllerDecorator', () => {
     }
     await sut.handle(httpRequest)
     expect(handleSpy).toBeCalledWith(httpRequest)
+  })
+
+  test('should call logError if httpResponse returns statusCode 500', async () => {
+    const { sut, controllerStub, logErrorRepositoryStub } = makeSut()
+    const serverErrorMock = serverError(new Error())
+    jest.spyOn(controllerStub, 'handle').mockImplementationOnce(async () => {
+      return new Promise(resolve => resolve(serverErrorMock))
+    })
+    const logErrorSpy = jest.spyOn(logErrorRepositoryStub, 'logError')
+    const httpRequest: HttpRequest = {
+      body: {
+        field: 'any_value'
+      }
+    }
+    await sut.handle(httpRequest)
+    expect(logErrorSpy).toBeCalled()
+    expect(logErrorSpy).toBeCalledWith(serverErrorMock.body.stack)
   })
 })
