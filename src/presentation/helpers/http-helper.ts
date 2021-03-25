@@ -12,7 +12,7 @@ export const serverError = (error: Error): HttpResponse => ({
 })
 
 export const unauthorizedError = (): HttpResponse => ({
-  statusCode: 403,
+  statusCode: 401,
   body: new UnauthorizedError()
 })
 
