@@ -2,6 +2,7 @@ import request from 'supertest'
 import app from '@/main/config/app'
 import { Collection } from 'mongodb'
 import { MongoHelper } from '@/infra/db/mongodb/mongo-helper'
+import { hash } from 'bcrypt'
 
 describe('Login Routes', () => {
   let accountCollection: Collection
@@ -17,13 +18,24 @@ describe('Login Routes', () => {
     accountCollection = await MongoHelper.getCollection('accounts')
     await accountCollection.deleteMany({})
   })
-  test('Should return an account name and accessToken on success', async () => {
-    await request(app)
-      .post('/api/login')
-      .send({
+
+  describe('POST /login', () => {
+    test('Should return 200 on login', async () => {
+      const password = await hash('123', 12)
+
+      await accountCollection.insertOne({
         name: 'any_name',
-        accessToken: 'access_token'
+        email: 'any_email@email.com',
+        password
       })
-      .expect(200)
+
+      await request(app)
+        .post('/api/login')
+        .send({
+          email: 'any_email@email.com',
+          password: '123'
+        })
+        .expect(200)
+    })
   })
 })
