@@ -1,10 +1,9 @@
-import { Encrypter } from '@/data/protocols/criptography/encrypter'
-import { HashComparer } from '@/data/protocols/criptography/hash-comparer'
-import { LoadAccountByEmailRepository } from '@/data/protocols/db/account/load-account-by-email-repository'
 import { DbAuthentication } from '@/data/usecases/db-authentication'
 import { BcryptAdapter } from '@/infra/criptography/bcrypt-adapter'
+import { JwtAdapter } from '@/infra/criptography/jwt-adapter'
 import { AccountMongoRepository } from '@/infra/db/mongodb'
 import { EmailValidatorAdapter } from '@/infra/validators/email-validator-adapter'
+import env from '@/main/config/env'
 import { LoginController } from '@/presentation/controllers/login/login-controller'
 import { Controller } from '@/presentation/protocols'
 import { EmailValidation, RequiredFieldValidation, ValidationComposite } from '@/validation/validators'
@@ -19,11 +18,10 @@ export const makeLoginController = (): Controller => {
     new EmailValidation('email', emailValidator)
   ])
 
-  const loadAccountByEmailRepository: LoadAccountByEmailRepository = new AccountMongoRepository()
-  const hashComparer: HashComparer = new BcryptAdapter(12)
-  const encrypter: Encrypter = new BcryptAdapter(12)
-  const updateAccessToken = new AccountMongoRepository()
-
-  const authentication = new DbAuthentication(loadAccountByEmailRepository, hashComparer, encrypter, updateAccessToken)
+  const salt = 12
+  const bcryptAdapter = new BcryptAdapter(salt)
+  const jwtAdapter = new JwtAdapter(env.jwtSecret)
+  const accountMongoRepository = new AccountMongoRepository()
+  const authentication = new DbAuthentication(accountMongoRepository, bcryptAdapter, jwtAdapter, accountMongoRepository)
   return makeLogControllerDecorator(new LoginController(validation, authentication))
 }
