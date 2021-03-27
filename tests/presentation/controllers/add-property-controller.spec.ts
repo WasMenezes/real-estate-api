@@ -1,7 +1,7 @@
 import { PropertyResidentialCommercialModel } from '@/domain/models/property-model'
 import { HttpRequest, Validation } from '../protocols'
 import { AddPropertyController } from '@/presentation/controllers/add-property-controller'
-import { badRequest, serverError } from '@/presentation/helpers/http-helper'
+import { badRequest, noContent, serverError } from '@/presentation/helpers/http-helper'
 import { AddProperty } from '@/domain/usecases/add-property'
 import MockDate from 'mockdate'
 
@@ -156,6 +156,15 @@ describe('AddProperty Controller', () => {
       }
       const httpResponse = await sut.handle(httpRequest)
       expect(httpResponse).toEqual(serverError(new Error()))
+    })
+
+    test('Should return no content if succeeds', async () => {
+      const { sut } = makeSut()
+      const httpRequest: HttpRequest = {
+        body: makeFakePropertyResidentialCommercialModel()
+      }
+      const httpResponse = await sut.handle(httpRequest)
+      expect(httpResponse).toEqual(noContent())
     })
   })
 })
