@@ -79,17 +79,17 @@ const makeValidationStub = (): Validation => {
 interface SutTypes {
   sut: AddPropertyController
   validationStub: Validation
-  AddPropertyStub: AddProperty
+  addPropertyStub: AddProperty
 }
 
 const makeSut = (): SutTypes => {
   const validationStub = makeValidationStub()
-  const AddPropertyStub = makeAddProperty()
-  const sut = new AddPropertyController(validationStub, AddPropertyStub)
+  const addPropertyStub = makeAddProperty()
+  const sut = new AddPropertyController(validationStub, addPropertyStub)
   return {
     sut,
     validationStub,
-    AddPropertyStub
+    addPropertyStub
   }
 }
 
@@ -137,13 +137,25 @@ describe('AddProperty Controller', () => {
 
   describe('add', () => {
     test('Should call add with correct values', async () => {
-      const { sut, AddPropertyStub } = makeSut()
-      const addSpy = jest.spyOn(AddPropertyStub, 'add')
+      const { sut, addPropertyStub } = makeSut()
+      const addSpy = jest.spyOn(addPropertyStub, 'add')
       const httpRequest: HttpRequest = {
         body: makeFakePropertyResidentialCommercialModel()
       }
       await sut.handle(httpRequest)
       expect(addSpy).toBeCalledWith({ ...httpRequest.body, date: new Date() })
+    })
+
+    test('Should throw if add throws', async () => {
+      const { sut, addPropertyStub } = makeSut()
+      jest.spyOn(addPropertyStub, 'add').mockImplementationOnce(() => {
+        throw new Error()
+      })
+      const httpRequest: HttpRequest = {
+        body: makeFakePropertyResidentialCommercialModel()
+      }
+      const httpResponse = await sut.handle(httpRequest)
+      expect(httpResponse).toEqual(serverError(new Error()))
     })
   })
 })
