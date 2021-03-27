@@ -60,8 +60,8 @@ const makeFakePropertyResidentialCommercialModel = (): PropertyResidentialCommer
 
 const makeAddProperty = (): AddProperty => {
   class AddProperty {
-    async add (): Promise<PropertyResidentialCommercialModel> {
-      return new Promise(resolve => resolve(makeFakePropertyResidentialCommercialModel()))
+    async add (): Promise<void> {
+      return new Promise(resolve => resolve(null))
     }
   }
   return new AddProperty()
