@@ -1,3 +1,4 @@
+import { badRequest, serverError } from '../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse, Validation } from '../protocols'
 
 export class AddPropertyController implements Controller {
@@ -6,7 +7,14 @@ export class AddPropertyController implements Controller {
   ) { }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    await this.validation.validate(httpRequest)
-    return null
+    try {
+      const error = this.validation.validate(httpRequest)
+      if (error) {
+        return badRequest(error)
+      }
+      return null
+    } catch (error) {
+      return serverError(error)
+    }
   }
 }
