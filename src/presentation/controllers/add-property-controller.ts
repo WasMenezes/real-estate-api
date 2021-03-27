@@ -1,9 +1,11 @@
-import { badRequest, serverError } from '../helpers/http-helper'
+import { AddProperty } from '@/domain/usecases/add-property'
+import { badRequest, serverError, noContent } from '../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse, Validation } from '../protocols'
 
 export class AddPropertyController implements Controller {
   constructor (
-    private readonly validation: Validation
+    private readonly validation: Validation,
+    private readonly addProperty: AddProperty
   ) { }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -12,7 +14,11 @@ export class AddPropertyController implements Controller {
       if (error) {
         return badRequest(error)
       }
-      return null
+      await this.addProperty.add({
+        ...httpRequest.body,
+        date: new Date()
+      })
+      return noContent()
     } catch (error) {
       return serverError(error)
     }
