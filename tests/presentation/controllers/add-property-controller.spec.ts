@@ -2,6 +2,8 @@ import { PropertyResidentialCommercialModel } from '@/domain/models/property-mod
 import { HttpRequest, Validation } from '../protocols'
 import { AddPropertyController } from '@/presentation/controllers/add-property-controller'
 import { badRequest, serverError } from '@/presentation/helpers/http-helper'
+import { AddProperty } from '@/domain/usecases/add-property'
+import MockDate from 'mockdate'
 
 const makeFakePropertyResidentialCommercialModel = (): PropertyResidentialCommercialModel => ({
   title: 'any_title',
@@ -56,6 +58,15 @@ const makeFakePropertyResidentialCommercialModel = (): PropertyResidentialCommer
   }
 })
 
+const makeAddProperty = (): AddProperty => {
+  class AddProperty {
+    async add (): Promise<PropertyResidentialCommercialModel> {
+      return new Promise(resolve => resolve(makeFakePropertyResidentialCommercialModel()))
+    }
+  }
+  return new AddProperty()
+}
+
 const makeValidationStub = (): Validation => {
   class ValidationStub implements Validation {
     validate (input: any): Error {
@@ -68,47 +79,71 @@ const makeValidationStub = (): Validation => {
 interface SutTypes {
   sut: AddPropertyController
   validationStub: Validation
+  AddPropertyStub: AddProperty
 }
 
 const makeSut = (): SutTypes => {
   const validationStub = makeValidationStub()
-  const sut = new AddPropertyController(validationStub)
+  const AddPropertyStub = makeAddProperty()
+  const sut = new AddPropertyController(validationStub, AddPropertyStub)
   return {
     sut,
-    validationStub
+    validationStub,
+    AddPropertyStub
   }
 }
 
-describe('AddProperty', () => {
-  test('should call Validation with correct values', async () => {
-    const { sut, validationStub } = makeSut()
-    const validateSpy = jest.spyOn(validationStub, 'validate')
-    const httpRequest: HttpRequest = { body: makeFakePropertyResidentialCommercialModel() }
-    await sut.handle(httpRequest)
-    expect(validateSpy).toBeCalledWith(httpRequest)
+describe('AddProperty Controller', () => {
+  beforeAll(() => {
+    MockDate.set(new Date())
   })
 
-  test('Should return a badRequest if Validation fails', async () => {
-    const { sut, validationStub } = makeSut()
-    jest.spyOn(validationStub, 'validate').mockImplementationOnce(() => {
-      return new Error()
+  afterAll(() => {
+    MockDate.reset()
+  })
+  describe('validate', () => {
+    test('should call Validation with correct values', async () => {
+      const { sut, validationStub } = makeSut()
+      const validateSpy = jest.spyOn(validationStub, 'validate')
+      const httpRequest: HttpRequest = { body: makeFakePropertyResidentialCommercialModel() }
+      await sut.handle(httpRequest)
+      expect(validateSpy).toBeCalledWith(httpRequest)
     })
-    const httpRequest: HttpRequest = {
-      body: makeFakePropertyResidentialCommercialModel()
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse).toEqual(badRequest(new Error()))
+
+    test('Should return a badRequest if Validation fails', async () => {
+      const { sut, validationStub } = makeSut()
+      jest.spyOn(validationStub, 'validate').mockImplementationOnce(() => {
+        return new Error()
+      })
+      const httpRequest: HttpRequest = {
+        body: makeFakePropertyResidentialCommercialModel()
+      }
+      const httpResponse = await sut.handle(httpRequest)
+      expect(httpResponse).toEqual(badRequest(new Error()))
+    })
+
+    test('Should throw if Validate throws', async () => {
+      const { sut, validationStub } = makeSut()
+      jest.spyOn(validationStub, 'validate').mockImplementationOnce(() => {
+        throw new Error()
+      })
+      const httpRequest: HttpRequest = {
+        body: makeFakePropertyResidentialCommercialModel()
+      }
+      const httpResponse = await sut.handle(httpRequest)
+      expect(httpResponse).toEqual(serverError(new Error()))
+    })
   })
 
-  test('Should throw if Validate throws', async () => {
-    const { sut, validationStub } = makeSut()
-    jest.spyOn(validationStub, 'validate').mockImplementationOnce(() => {
-      throw new Error()
+  describe('add', () => {
+    test('Should call add with correct values', async () => {
+      const { sut, AddPropertyStub } = makeSut()
+      const addSpy = jest.spyOn(AddPropertyStub, 'add')
+      const httpRequest: HttpRequest = {
+        body: makeFakePropertyResidentialCommercialModel()
+      }
+      await sut.handle(httpRequest)
+      expect(addSpy).toBeCalledWith({ ...httpRequest.body, date: new Date() })
     })
-    const httpRequest: HttpRequest = {
-      body: makeFakePropertyResidentialCommercialModel()
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse).toEqual(serverError(new Error()))
   })
 })
