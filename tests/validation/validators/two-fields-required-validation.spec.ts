@@ -12,4 +12,13 @@ describe('TwoFieldsRequired Validation', () => {
     })
     expect(error).toEqual(new MissingParamError('fieldNameRequired'))
   })
+
+  test('should return null if validate succeeds', () => {
+    const sut = makeSut()
+    const error = sut.validate({
+      fieldNameVerify: true,
+      fieldNameRequired: 'any_value'
+    })
+    expect(error).toBeFalsy()
+  })
 })
