@@ -21,4 +21,13 @@ describe('TwoFieldsRequired Validation', () => {
     })
     expect(error).toBeFalsy()
   })
+
+  test('should validate succeeds if fieldNameVerify is false', () => {
+    const sut = makeSut()
+    const error = sut.validate({
+      fieldNameVerify: false,
+      fieldNameRequired: null
+    })
+    expect(error).toBeFalsy()
+  })
 })
