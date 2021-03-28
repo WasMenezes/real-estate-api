@@ -81,5 +81,12 @@ describe('AccountMongoRepository', () => {
       expect(account).toBeTruthy()
       expect(account.id).toBeTruthy()
     })
+
+    test('should return null on loadByToken with invalid Role', async () => {
+      await accountCollection.insertOne({ accessToken: 'any_token', ...makeFakeAccount() })
+      const sut = makeSut()
+      const account = await sut.loadByToken('any_token', 'admin')
+      expect(account).toBeFalsy()
+    })
   })
 })
