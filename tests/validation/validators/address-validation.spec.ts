@@ -4,7 +4,7 @@ import { AddressValidation } from '@/validation/validators/address-validation'
 const makeSut = (): AddressValidation => { return new AddressValidation('address', ['fieldAdressName']) }
 
 describe('Address Validation', () => {
-  test('should call return a MissingParamError if validations fails', () => {
+  test('should return a MissingParamError if validations fails', () => {
     const sut = makeSut()
     const error = sut.validate({
       address: {
@@ -12,5 +12,11 @@ describe('Address Validation', () => {
       }
     })
     expect(error).toEqual(new MissingParamError('fieldAdressName'))
+  })
+
+  test('should return null if validations succeeds', () => {
+    const sut = makeSut()
+    const error = sut.validate({ address: { fieldAdressName: 'any_value' } })
+    expect(error).toBeFalsy()
   })
 })
