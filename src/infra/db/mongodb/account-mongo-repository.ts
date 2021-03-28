@@ -1,9 +1,9 @@
 import { LoadAccountByEmailRepository } from '@/data/protocols/db/account/load-account-by-email-repository'
 import { LoadAccountByTokenRepository } from '@/data/protocols/db/account/load-account-by-token-repository'
-import { UpdateAccessToken } from '@/data/protocols/db/account/update-access-token'
+import { UpdateAccessTokenRepository } from '@/data/protocols/db/account/update-access-token-repository'
 import { MongoHelper } from './mongo-helper'
 
-export class AccountMongoRepository implements LoadAccountByEmailRepository, UpdateAccessToken, LoadAccountByTokenRepository {
+export class AccountMongoRepository implements LoadAccountByEmailRepository, UpdateAccessTokenRepository, LoadAccountByTokenRepository {
   async loadByEmail (email: string): Promise<LoadAccountByEmailRepository.Result> {
     const accountCollection = await MongoHelper.getCollection('accounts')
     const account = await accountCollection.findOne({ email })
