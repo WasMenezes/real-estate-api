@@ -6,6 +6,7 @@ import { AddProperty } from '@/domain/usecases/add-property'
 import MockDate from 'mockdate'
 
 const makeFakePropertyResidentialCommercialModel = (): PropertyResidentialCommercialModel => ({
+  id: 'any_id',
   title: 'any_title',
   description: 'any_description',
   rent: true,

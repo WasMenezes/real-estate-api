@@ -5,6 +5,7 @@ import { MongoHelper } from '@/infra/db/mongodb/mongo-helper'
 import { PropertyModel, PropertyResidentialCommercialModel } from '@/domain/models/property-model'
 
 const makeFakeProperty = (): PropertyModel => ({
+  id: 'any_value',
   title: 'any_title',
   description: 'any_description',
   rent: true,

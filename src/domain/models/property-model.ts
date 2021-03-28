@@ -26,6 +26,7 @@ export interface PropertyResidentialCommercialModel extends PropertyModel {
 }
 
 export type PropertyModel = {
+  id: string
   title: string
   description: string
   rent: boolean

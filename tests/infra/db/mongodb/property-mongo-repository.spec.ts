@@ -1,6 +1,5 @@
 import { PropertyMongoRepository } from '@/infra/db/mongodb/property-mongo-repository'
 import { MongoHelper } from '@/infra/db/mongodb/mongo-helper'
-
 import { Collection } from 'mongodb'
 import { PropertyModel, PropertyResidentialCommercialModel } from '@/domain/models/property-model'
 
@@ -9,6 +8,7 @@ const makeSut = (): PropertyMongoRepository => {
 }
 
 const makeFakeProperty = (): PropertyModel => ({
+  id: 'any_id',
   title: 'any_title',
   description: 'any_description',
   rent: true,
@@ -82,7 +82,7 @@ describe('PropertyMongoRepository', () => {
   })
 
   describe('PropertyMongoRepository', () => {
-    test('Should add property on success', async () => {
+    test('Should add on success', async () => {
       const sut = makeSut()
       await sut.add(makeFakePropertyResidentialCommercialModel())
       await sut.add(makeFakeProperty())
