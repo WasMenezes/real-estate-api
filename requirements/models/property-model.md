@@ -8,7 +8,7 @@
 - **Rent Price** (number) - **should be mandatory if the Rent field is true**
 - **Sale** (boolean)
 - **Sale Price** (number) -  **should be mandatory if the Sale field is true**
--	**Adress**(Address Model)
+-	**address**(Address Model)
 - **Current Tribute Paid** (boolean)
 - **Tribute Belongs Owner** (boolean)
 - **Tribute** (IPTU) (number?)

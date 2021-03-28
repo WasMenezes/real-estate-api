@@ -15,7 +15,7 @@ const makeFakeProperty = (): PropertyModel => ({
   rentPrice: 999.99,
   sale: true,
   salePrice: 999999.99,
-  adress: {
+  address: {
     zipcode: 'any_zipcode',
     street: 'any_street',
     number: 999,

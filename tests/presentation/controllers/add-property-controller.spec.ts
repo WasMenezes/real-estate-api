@@ -12,7 +12,7 @@ const makeFakePropertyResidentialCommercialModel = (): PropertyResidentialCommer
   rentPrice: 999.99,
   sale: true,
   salePrice: 999999.99,
-  adress: {
+  address: {
     zipcode: 'any_zipcode',
     street: 'any_street',
     number: 999,
@@ -107,7 +107,7 @@ describe('AddProperty Controller', () => {
       const validateSpy = jest.spyOn(validationStub, 'validate')
       const httpRequest: HttpRequest = { body: makeFakePropertyResidentialCommercialModel() }
       await sut.handle(httpRequest)
-      expect(validateSpy).toBeCalledWith(httpRequest)
+      expect(validateSpy).toBeCalledWith(httpRequest.body)
     })
 
     test('Should return a badRequest if Validation fails', async () => {

@@ -32,7 +32,7 @@ export type PropertyModel = {
   rentPrice: number
   sale: boolean
   salePrice: number
-  adress: AddressModel
+  address: AddressModel
   currentTributePaid: boolean
   tributeBelongsOwner: boolean
   tribute: number
