@@ -1,10 +1,10 @@
-import { InvalidParamError } from '@/presentation/errors'
 import { EmailValidation } from '@/validation/validators/email-validation'
-import { EmailValidator } from '../protocols'
+import { InvalidParamError } from '@/presentation/errors'
+import { EmailValidator } from '@/validation/protocols/email-validator'
 
 const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
-    isValid (email: string): boolean {
+    isValid (): boolean {
       return true
     }
   }
@@ -40,11 +40,11 @@ describe('EmailValidation', () => {
   })
 
   test('should return InvalidParamError if validate fails', () => {
-    const { sut } = makeSut()
-    jest.spyOn(sut, 'validate').mockImplementationOnce(() => {
-      return new InvalidParamError('email')
+    const { sut, emailValidatorStub } = makeSut()
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => {
+      return false
     })
-    const isValid = sut.validate('invalid_email@mail.com')
+    const isValid = sut.validate({ email: 'invalid_email@mail.com' })
     expect(isValid).toEqual(new InvalidParamError('email'))
   })
 
