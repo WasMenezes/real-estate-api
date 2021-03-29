@@ -1,6 +1,6 @@
 import { LoadAccountByToken } from '@/domain/usecases/load-account-by-token'
 import { AccessDeniedError } from '@/presentation/errors/access-denied-error'
-import { forbidden } from '@/presentation/helpers/http-helper'
+import { forbidden, serverError } from '@/presentation/helpers/http-helper'
 import { AuthMiddleware } from '@/presentation/middlewares/auth-middleware'
 
 class LoadAccountByTokenStub implements LoadAccountByToken {
@@ -52,7 +52,21 @@ describe('AuthMiddleware', () => {
       accessToken: 'any_token',
       role
     }
-    const account = await sut.handle(httpRequest)
-    expect(account).toEqual(forbidden(new AccessDeniedError()))
+    const httResponse = await sut.handle(httpRequest)
+    expect(httResponse).toEqual(forbidden(new AccessDeniedError()))
+  })
+
+  test('Should return 500 if LoadAccountByToken throws', async () => {
+    const role = 'any_role'
+    const { sut, loadAccountByTokenStub } = makeSut(role)
+    jest.spyOn(loadAccountByTokenStub, 'load').mockImplementationOnce(async () => {
+      throw new Error()
+    })
+    const httpRequest = {
+      accessToken: 'any_token',
+      role
+    }
+    const httResponse = await sut.handle(httpRequest)
+    expect(httResponse).toEqual(serverError(new Error()))
   })
 })
