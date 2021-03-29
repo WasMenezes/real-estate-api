@@ -1,6 +1,6 @@
 import { LoadAccountByToken } from '@/domain/usecases/load-account-by-token'
 import { AccessDeniedError } from '@/presentation/errors/access-denied-error'
-import { forbidden, serverError } from '@/presentation/helpers/http-helper'
+import { forbidden, ok, serverError } from '@/presentation/helpers/http-helper'
 import { AuthMiddleware } from '@/presentation/middlewares/auth-middleware'
 
 class LoadAccountByTokenStub implements LoadAccountByToken {
@@ -24,6 +24,7 @@ interface SutTypes {
 }
 
 describe('AuthMiddleware', () => {
+  const role = 'any_role'
   test('Should return 403 if no x-access-token exists in headers', async () => {
     const { sut } = makeSut()
     const httpResponse = await sut.handle({})
@@ -31,7 +32,6 @@ describe('AuthMiddleware', () => {
   })
 
   test('Should call LoadAccountByToken with correct accessToken', async () => {
-    const role = 'any_role'
     const { sut, loadAccountByTokenStub } = makeSut(role)
     const loadAccountByTokenSpy = jest.spyOn(loadAccountByTokenStub, 'load')
     const httpRequest = {
@@ -43,7 +43,6 @@ describe('AuthMiddleware', () => {
   })
 
   test('Should return forbidden if not found account', async () => {
-    const role = 'any_role'
     const { sut, loadAccountByTokenStub } = makeSut(role)
     jest.spyOn(loadAccountByTokenStub, 'load').mockImplementationOnce(() => {
       return null
@@ -57,7 +56,6 @@ describe('AuthMiddleware', () => {
   })
 
   test('Should return 500 if LoadAccountByToken throws', async () => {
-    const role = 'any_role'
     const { sut, loadAccountByTokenStub } = makeSut(role)
     jest.spyOn(loadAccountByTokenStub, 'load').mockImplementationOnce(async () => {
       throw new Error()
@@ -68,5 +66,15 @@ describe('AuthMiddleware', () => {
     }
     const httResponse = await sut.handle(httpRequest)
     expect(httResponse).toEqual(serverError(new Error()))
+  })
+
+  test('Should return 200 if LoadAccountByToken returns an account', async () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      accessToken: 'any_token',
+      role
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual(ok({ accountId: 'any_id' }))
   })
 })
