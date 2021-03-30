@@ -3,6 +3,8 @@ import app from '@/main/config/app'
 import { Collection } from 'mongodb'
 import { MongoHelper } from '@/infra/db/mongodb/mongo-helper'
 import { PropertyModel, PropertyResidentialCommercialModel } from '@/domain/models/property-model'
+import env from '@/main/config/env'
+import { sign } from 'jsonwebtoken'
 
 const makeFakeProperty = (): PropertyModel => ({
   id: 'any_value',
@@ -62,8 +64,29 @@ const makeFakePropertyResidentialCommercialModel = (): PropertyResidentialCommer
   steamRoom: true
 })
 
+const mockAccessToken = async (): Promise<string> => {
+  const res = await accountCollection.insertOne({
+    name: 'Was',
+    email: 'wasmenezes@gmail.com',
+    password: '123',
+    role: 'admin'
+  })
+  const id = res.ops[0]._id
+  const accessToken = sign({ id }, env.jwtSecret)
+  await accountCollection.updateOne({
+    _id: id
+  }, {
+    $set: {
+      accessToken
+    }
+  })
+  return accessToken
+}
+
+let propertyCollection: Collection
+let accountCollection: Collection
+
 describe('AddProperty Routes', () => {
-  let propertyCollection: Collection
   beforeAll(async () => {
     await MongoHelper.connect(process.env.MONGO_URL)
   })
@@ -75,17 +98,22 @@ describe('AddProperty Routes', () => {
   beforeEach(async () => {
     propertyCollection = await MongoHelper.getCollection('property')
     await propertyCollection.deleteMany({})
+    accountCollection = await MongoHelper.getCollection('accounts')
+    await accountCollection.deleteMany({})
   })
 
   describe('POST /properties', () => {
     test('Should return 204 if add-property succeeds', async () => {
+      const accessToken = await mockAccessToken()
       await request(app)
         .post('/api/properties')
+        .set('x-access-token', accessToken)
         .send(makeFakeProperty())
         .expect(204)
 
       await request(app)
         .post('/api/properties')
+        .set('x-access-token', accessToken)
         .send(makeFakePropertyResidentialCommercialModel())
         .expect(204)
 
