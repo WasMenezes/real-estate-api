@@ -6,7 +6,7 @@ export class DbLoadAccountByToken implements LoadAccountByToken {
   constructor (
     private readonly decrypter: Decrypter,
     private readonly loadAccountByTokenRepository: LoadAccountByTokenRepository
-  ) {}
+  ) { }
 
   async load (accessToken: string, role?: string): Promise<LoadAccountByToken.Result> {
     let token: string
@@ -17,8 +17,13 @@ export class DbLoadAccountByToken implements LoadAccountByToken {
     }
 
     if (token) {
-      await this.loadAccountByTokenRepository.loadByToken(accessToken, role)
+      try {
+        await this.loadAccountByTokenRepository.loadByToken(accessToken, role)
+        return new Promise(resolve => resolve({ id: token }))
+      } catch (error) {
+        return null
+      }
     }
-    return new Promise(resolve => resolve({ id: token }))
+    return null
   }
 }
