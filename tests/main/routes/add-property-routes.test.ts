@@ -120,5 +120,12 @@ describe('AddProperty Routes', () => {
       const count = await propertyCollection.countDocuments()
       expect(count).toBe(2)
     })
+
+    test('Should return 403 if access token are not provieded', async () => {
+      await request(app)
+        .post('/api/properties')
+        .send(makeFakeProperty())
+        .expect(403)
+    })
   })
 })
