@@ -127,5 +127,13 @@ describe('AddProperty Routes', () => {
         .send(makeFakeProperty())
         .expect(403)
     })
+
+    test('Should return 403 if access token are not provieded', async () => {
+      await request(app)
+        .post('/api/properties')
+        .set('x-access-token', 'invalid_token')
+        .send(makeFakeProperty())
+        .expect(403)
+    })
   })
 })
