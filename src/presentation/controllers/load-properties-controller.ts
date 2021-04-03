@@ -9,7 +9,7 @@ export class LoadPropertiesController implements Controller {
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
       const properties = await this.loadProperties.load(httpRequest.body)
-      return properties.length ? ok(properties) : noContent()
+      return properties?.length ? ok(properties) : noContent()
     } catch (error) {
       return serverError(error)
     }
