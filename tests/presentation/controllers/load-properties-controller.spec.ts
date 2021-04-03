@@ -95,4 +95,18 @@ describe('LoadPropertiesController', () => {
     await sut.handle(httpRequest)
     expect(loadPropertiesSpy).toBeCalledWith(httpRequest.body)
   })
+
+  test('should throw if  loadPropertiesStub throws', async () => {
+    const { sut, loadPropertiesStub } = makeSut()
+    jest.spyOn(loadPropertiesStub, 'load').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpRequest = {
+      body: {
+        title: 'any_title'
+      }
+    }
+    const httpResposne = sut.handle(httpRequest)
+    await expect(httpResposne).rejects.toThrow()
+  })
 })
