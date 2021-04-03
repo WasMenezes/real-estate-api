@@ -1,8 +1,11 @@
 import { PropertyModel, PropertyResidentialCommercialModel } from '@/domain/models/property-model'
 import { LoadProperties } from '@/domain/usecases/load-properties'
 import { LoadPropertiesController } from '@/presentation/controllers/load-properties-controller'
+import { noContent, serverError } from '@/presentation/helpers/http-helper'
 
-const makeFakePropertyResidentialCommercialModel = (): PropertyResidentialCommercialModel => ({
+import MockDate from 'mockdate'
+
+const makeFakePropertyModel = (): PropertyModel => ({
   id: 'any_id',
   title: 'any_title',
   description: 'any_description',
@@ -28,6 +31,15 @@ const makeFakePropertyResidentialCommercialModel = (): PropertyResidentialCommer
   deed: true,
   createdAt: new Date(),
   updated: new Date(),
+
+  type: {
+    id: 1,
+    description: 'any_description'
+  }
+})
+
+const makeFakePropertyResidentialCommercialModel = (): PropertyResidentialCommercialModel => ({
+  ...makeFakePropertyModel(),
   registeredHousePlan: true,
   propertyAge: 9,
   suites: 9,
@@ -49,20 +61,15 @@ const makeFakePropertyResidentialCommercialModel = (): PropertyResidentialCommer
   lavatory: true,
   gurnished: true,
   pool: true,
-  steamRoom: true,
-  type: {
-    id: 1,
-    description: 'any_description'
-  }
+  steamRoom: true
 })
 
 const makeLoadPropertiesStub = (): LoadProperties => {
   class LoadPropertiesStub implements LoadProperties {
-    async load (): Promise<PropertyModel[] | PropertyResidentialCommercialModel[]> {
+    async load (): Promise<Array<PropertyModel | PropertyResidentialCommercialModel>> {
       return new Promise(resolve => resolve([
         makeFakePropertyResidentialCommercialModel(),
-        makeFakePropertyResidentialCommercialModel(),
-        makeFakePropertyResidentialCommercialModel()
+        makeFakePropertyModel()
       ]))
     }
   }
@@ -84,29 +91,65 @@ const makeSut = (): SutTypes => {
 }
 
 describe('LoadPropertiesController', () => {
-  test('should call loadPropertiesStub with correct values', async () => {
+  beforeAll(() => {
+    MockDate.set(new Date())
+  })
+
+  afterAll(() => {
+    MockDate.reset()
+  })
+  test('should call loadProperties with correct values', async () => {
     const { sut, loadPropertiesStub } = makeSut()
     const loadPropertiesSpy = jest.spyOn(loadPropertiesStub, 'load')
     const httpRequest = {
       body: {
-        title: 'any_title'
+        rent: true
       }
     }
     await sut.handle(httpRequest)
     expect(loadPropertiesSpy).toBeCalledWith(httpRequest.body)
   })
 
-  test('should throw if  loadPropertiesStub throws', async () => {
+  test('should return 500 if loadProperties throws', async () => {
     const { sut, loadPropertiesStub } = makeSut()
     jest.spyOn(loadPropertiesStub, 'load').mockImplementationOnce(() => {
       throw new Error()
     })
     const httpRequest = {
       body: {
-        title: 'any_title'
+        rent: true
       }
     }
-    const httpResposne = sut.handle(httpRequest)
-    await expect(httpResposne).rejects.toThrow()
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual(serverError(new Error()))
+  })
+
+  test('should return property collection if succeeds', async () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        rent: true
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse.body).toEqual([
+      makeFakePropertyResidentialCommercialModel(),
+      makeFakePropertyModel()
+    ])
+  })
+
+  test('should return noContent if cannot find properties', async () => {
+    const { sut, loadPropertiesStub } = makeSut()
+    jest.spyOn(loadPropertiesStub, 'load').mockImplementationOnce(async () => {
+      let emptyArray: Array<PropertyModel | PropertyResidentialCommercialModel>
+      return new Promise(resolve => resolve(emptyArray))
+    })
+    const httpRequest = {
+      body: {
+        rent: true
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual(noContent())
   })
 })
