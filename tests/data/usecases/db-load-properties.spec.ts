@@ -87,7 +87,7 @@ interface SutTypes {
 }
 
 describe('DbLoadProperties Usecase', () => {
-  test('should call LoadProperties with correct values', async () => {
+  test('should call LoadPropertiesRepositories with correct values', async () => {
     const { sut, loadPropertiesRepositoryStub } = makeSut()
     const loadPropertiesRepositorySpy = jest.spyOn(loadPropertiesRepositoryStub, 'loadByFilter')
     const httpRequest = {
@@ -97,5 +97,19 @@ describe('DbLoadProperties Usecase', () => {
     }
     await sut.load(httpRequest)
     expect(loadPropertiesRepositorySpy).toHaveBeenCalledWith(httpRequest)
+  })
+
+  test('should trhow if LoadPropertiesRepositories throws', async () => {
+    const { sut, loadPropertiesRepositoryStub } = makeSut()
+    jest.spyOn(loadPropertiesRepositoryStub, 'loadByFilter').mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpRequest = {
+      rent: true,
+      rentPriceMin: 1,
+      rentPriceMax: 1000
+    }
+    const httpResponse = sut.load(httpRequest)
+    await expect(httpResponse).rejects.toThrow()
   })
 })
