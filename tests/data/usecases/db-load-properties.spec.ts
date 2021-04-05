@@ -1,6 +1,9 @@
 import { PropertyModel, PropertyResidentialCommercialModel } from '@/domain/models/property-model'
 import { LoadPropertiesRepository } from '../protocols/db/property/load-properties-repository'
 import { DbLoadProperties } from '@/data/usecases/db-load-properties'
+
+import MockDate from 'mockdate'
+
 const makeFakeProperty = (): PropertyModel => ({
   id: 'any_id',
   title: 'any_title',
@@ -87,6 +90,14 @@ interface SutTypes {
 }
 
 describe('DbLoadProperties Usecase', () => {
+  beforeAll(() => {
+    MockDate.set(new Date())
+  })
+
+  afterAll(() => {
+    MockDate.reset()
+  })
+
   test('should call LoadPropertiesRepositories with correct values', async () => {
     const { sut, loadPropertiesRepositoryStub } = makeSut()
     const loadPropertiesRepositorySpy = jest.spyOn(loadPropertiesRepositoryStub, 'loadByFilter')
@@ -99,7 +110,7 @@ describe('DbLoadProperties Usecase', () => {
     expect(loadPropertiesRepositorySpy).toHaveBeenCalledWith(httpRequest)
   })
 
-  test('should trhow if LoadPropertiesRepositories throws', async () => {
+  test('should throw if LoadPropertiesRepositories throws', async () => {
     const { sut, loadPropertiesRepositoryStub } = makeSut()
     jest.spyOn(loadPropertiesRepositoryStub, 'loadByFilter').mockImplementationOnce(() => {
       throw new Error()
@@ -111,5 +122,15 @@ describe('DbLoadProperties Usecase', () => {
     }
     const httpResponse = sut.load(httpRequest)
     await expect(httpResponse).rejects.toThrow()
+  })
+
+  test('should a list of properties on success', async () => {
+    const { sut } = makeSut()
+    const httpRequest = { }
+    const httpResponse = await sut.load(httpRequest)
+    await expect(httpResponse).toEqual([
+      makeFakeProperty(),
+      makeFakePropertyResidentialCommercialModel()
+    ])
   })
 })
