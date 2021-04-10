@@ -100,6 +100,14 @@ describe('PropertyMongoRepository', () => {
         const properties = await sut.loadByFilter({ rent: true, rentPriceMin: 0 })
         expect(properties.length).toBe(2)
       })
+
+      test('Should return an empty array if it does not meet the approved filter', async () => {
+        await propertyCollection.insertOne(makeFakePropertyResidentialCommercialModel())
+        await propertyCollection.insertOne(makeFakePropertyResidentialCommercialModel())
+        const sut = makeSut()
+        const properties = await sut.loadByFilter({ rent: false, rentPriceMin: 0 })
+        expect(properties.length).toBe(0)
+      })
     })
   })
 })
