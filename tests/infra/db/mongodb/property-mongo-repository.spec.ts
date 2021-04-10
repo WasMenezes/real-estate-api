@@ -82,12 +82,24 @@ describe('PropertyMongoRepository', () => {
   })
 
   describe('PropertyMongoRepository', () => {
-    test('Should add on success', async () => {
-      const sut = makeSut()
-      await sut.add(makeFakePropertyResidentialCommercialModel())
-      await sut.add(makeFakeProperty())
-      const count = await propertyCollection.countDocuments()
-      expect(count).toBe(2)
+    describe('add()', () => {
+      test('Should add on success', async () => {
+        const sut = makeSut()
+        await sut.add(makeFakePropertyResidentialCommercialModel())
+        await sut.add(makeFakeProperty())
+        const count = await propertyCollection.countDocuments()
+        expect(count).toBe(2)
+      })
+    })
+
+    describe('loadByFilter()', () => {
+      test('Should return properties that meet the filter passed', async () => {
+        await propertyCollection.insertOne(makeFakePropertyResidentialCommercialModel())
+        await propertyCollection.insertOne(makeFakePropertyResidentialCommercialModel())
+        const sut = makeSut()
+        const properties = await sut.loadByFilter({ rent: true, rentPriceMin: 0 })
+        expect(properties.length).toBe(2)
+      })
     })
   })
 })
