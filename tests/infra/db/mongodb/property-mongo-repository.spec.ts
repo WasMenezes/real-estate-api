@@ -108,6 +108,12 @@ describe('PropertyMongoRepository', () => {
         const properties = await sut.loadByFilter({ rent: false, rentPriceMin: 0 })
         expect(properties.length).toBe(0)
       })
+
+      test('Should suceeds if no filter are provided', async () => {
+        const sut = makeSut()
+        const properties = await sut.loadByFilter()
+        expect(properties.length).toBe(0)
+      })
     })
   })
 })
