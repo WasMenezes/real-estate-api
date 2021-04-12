@@ -2,7 +2,7 @@ import { AddressModel } from '../models/address-model'
 import { PropertyModel, PropertyResidentialCommercialModel } from '../models/property-model'
 
 export interface LoadProperties {
-  load: (filter: LoadProperties.PropertyFilter) => Promise<Array<PropertyModel | PropertyResidentialCommercialModel>>
+  load: (filter?: LoadProperties.PropertyFilter) => Promise<Array<PropertyModel | PropertyResidentialCommercialModel>>
 }
 
 export namespace LoadProperties {

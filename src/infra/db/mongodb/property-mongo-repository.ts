@@ -10,50 +10,51 @@ export class PropertyMongoRepository implements AddPropertyRepository, LoadPrope
     await propertyCollection.insertOne(data)
   }
 
-  async loadByFilter (filter: LoadProperties.PropertyFilter): Promise<Array<PropertyModel | PropertyResidentialCommercialModel>> {
+  async loadByFilter (filter?: LoadProperties.PropertyFilter): Promise<Array<PropertyModel | PropertyResidentialCommercialModel>> {
     const propertyCollection = await MongoHelper.getCollection('property')
     const query = filter ? { $and: [] } : {}
-    const filterFields = [
-      'rent',
-      'sale',
-      'currentTributePaid',
-      'tributeBelongsOwner',
-      'deed',
-      'registeredHousePlan',
-      'airConditioner',
-      'bar',
-      'library',
-      'barbecueGrill',
-      'americanKitchen',
-      'fittedKitchen',
-      'pantry',
-      'edicule',
-      'office',
-      'bathtub',
-      'fireplace',
-      'lavatory',
-      'gurnished',
-      'pool',
-      'steamRoom',
-      'tribute',
-      'condominium',
-      'areaTotal',
-      'areaUtil',
-      'bathrooms',
-      'rooms',
-      'garage',
-      'garageCovered'
-    ]
+    if (filter) {
+      const filterFields = [
+        'rent',
+        'sale',
+        'currentTributePaid',
+        'tributeBelongsOwner',
+        'deed',
+        'registeredHousePlan',
+        'airConditioner',
+        'bar',
+        'library',
+        'barbecueGrill',
+        'americanKitchen',
+        'fittedKitchen',
+        'pantry',
+        'edicule',
+        'office',
+        'bathtub',
+        'fireplace',
+        'lavatory',
+        'gurnished',
+        'pool',
+        'steamRoom',
+        'tribute',
+        'condominium',
+        'areaTotal',
+        'areaUtil',
+        'bathrooms',
+        'rooms',
+        'garage',
+        'garageCovered'
+      ]
 
-    for (const field of filterFields) {
-      if (filter[field] != null) { query.$and.push({ [field]: filter[field] }) }
+      for (const field of filterFields) {
+        if (filter[field] != null) { query.$and.push({ [field]: filter[field] }) }
+      }
+      if (filter.rentPriceMin) { query.$and.push({ rentPrice: { $gt: filter.rentPriceMin } }) }
+      if (filter.rentPriceMax) { query.$and.push({ rentPrice: { $lt: filter.rentPriceMax } }) }
+      if (filter.salePriceMin) { query.$and.push({ salePrice: { $gt: filter.salePriceMin } }) }
+      if (filter.salePriceMax) { query.$and.push({ salePrice: { $lt: filter.salePriceMax } }) }
     }
-    if (filter.rentPriceMin) { query.$and.push({ rentPrice: { $gt: filter.rentPriceMin } }) }
-    if (filter.rentPriceMax) { query.$and.push({ rentPrice: { $lt: filter.rentPriceMax } }) }
-    if (filter.salePriceMin) { query.$and.push({ salePrice: { $gt: filter.salePriceMin } }) }
-    if (filter.salePriceMax) { query.$and.push({ salePrice: { $lt: filter.salePriceMax } }) }
     const properties = await propertyCollection.find(query).toArray()
-
     return properties && MongoHelper.mapCollection(properties)
   }
 }
