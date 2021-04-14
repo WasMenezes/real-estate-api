@@ -111,7 +111,7 @@ describe('PropertyMongoRepository', () => {
 
       test('Should suceeds if no filter are provided', async () => {
         const sut = makeSut()
-        const properties = await sut.loadByFilter()
+        const properties = await sut.loadByFilter({})
         expect(properties.length).toBe(0)
       })
     })
