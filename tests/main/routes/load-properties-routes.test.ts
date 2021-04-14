@@ -23,7 +23,7 @@ describe('AddProperty Routes', () => {
     test('Should return no content if none property are find', async () => {
       await request(app)
         .get('/api/properties')
-        .send({ rent: true })
+        .send({})
         .expect(204)
     })
   })

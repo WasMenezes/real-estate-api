@@ -12,7 +12,8 @@ export class PropertyMongoRepository implements AddPropertyRepository, LoadPrope
 
   async loadByFilter (filter?: LoadProperties.PropertyFilter): Promise<Array<PropertyModel | PropertyResidentialCommercialModel>> {
     const propertyCollection = await MongoHelper.getCollection('property')
-    const query = filter ? { $and: [] } : {}
+    const query: any = Object.keys(filter).length > 0 ? { $and: [] } : filter
+
     if (filter) {
       const filterFields = [
         'rent',

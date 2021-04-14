@@ -7,7 +7,7 @@ export class DbLoadProperties implements LoadProperties {
     private readonly loadPropertiesRepository: LoadPropertiesRepository
   ) { }
 
-  async load (filter: LoadProperties.PropertyFilter): Promise<Array<PropertyModel | PropertyResidentialCommercialModel>> {
+  async load (filter?: LoadProperties.PropertyFilter): Promise<Array<PropertyModel | PropertyResidentialCommercialModel>> {
     const properties = await this.loadPropertiesRepository.loadByFilter(filter)
     return properties
   }
